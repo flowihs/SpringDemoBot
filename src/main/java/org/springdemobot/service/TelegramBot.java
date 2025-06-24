@@ -1,15 +1,17 @@
 package org.springdemobot.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdemobot.config.BotConfig;
 import org.springdemobot.enums.BotMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.annotation.PostConstruct;
-
 
 @Slf4j
 @Component
@@ -17,17 +19,14 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private final BotConfig config;
     private final UserService userService;
-    private final MessageSenderService messageSender;
     private final BotCommandService botCommandService;
 
     @Autowired
     public TelegramBot(BotConfig config,
                        UserService userService,
-                       MessageSenderService messageSender,
                        BotCommandService botCommandService) {
         this.config = config;
         this.userService = userService;
-        this.messageSender = messageSender;
         this.botCommandService = botCommandService;
     }
 
@@ -41,19 +40,35 @@ public class TelegramBot extends TelegramLongPollingBot {
                 startCommandReceived(chatId, update.getMessage().getChat().getFirstName());
                 break;
             case "/help":
-                messageSender.sendMessage(chatId, BotMessage.HELP_MESSAGE);
+                sendMessage(chatId, BotMessage.HELP_MESSAGE);
                 break;
             default:
-                messageSender.sendMessage(chatId, BotMessage.UNKNOWN_COMMAND);
+                sendMessage(chatId, BotMessage.UNKNOWN_COMMAND);
+        }
+    }
+
+    private void sendMessage(long chatId, BotMessage message) {
+        sendMessage(chatId, message.get());
+    }
+
+    private void sendMessage(long chatId, String textToSend) {
+        SendMessage message = new SendMessage();
+        message.setChatId(String.valueOf(chatId));
+        message.setText(textToSend);
+
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
+            log.error("Error occurred while sending message: " + e.getMessage());
         }
     }
 
     private void startCommandReceived(long chatId, String name) {
         log.info("Replied to user: " + name);
-        messageSender.sendMessage(chatId, BotMessage.WELCOME);
+        sendMessage(chatId, BotMessage.WELCOME);
     }
 
-    //|--------------------------------------------------------------------------------------------------------------------|
+//|--------------------------------------------------------------------------------------------------------------------|
     @PostConstruct
     private void init() {
         botCommandService.initializeCommands(this);
