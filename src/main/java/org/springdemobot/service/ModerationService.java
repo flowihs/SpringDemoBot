@@ -50,6 +50,21 @@ public class ModerationService {
         }
     }
 
+    public void kickUser(TelegramLongPollingBot bot, Long userId, Long chatId) {
+        RestrictChatMember kickUser = new RestrictChatMember();
+        kickUser.setChatId(String.valueOf(chatId));
+        kickUser.setUserId(userId);
+        ChatPermissions permissions = new ChatPermissions();
+        permissions.setCanSendMessages(false);
+        kickUser.setPermissions(permissions);
+        try {
+            bot.execute(kickUser);
+            log.info("User with ID {} was played in chat {}", userId, chatId);
+        } catch (TelegramApiException e) {
+            log.error(e.getMessage());
+        }
+    }
+
     public void banUser(TelegramLongPollingBot bot, Long userId, Long chatId, int seconds) {
         BanChatMember banChatMember = new BanChatMember();
         banChatMember.setChatId(String.valueOf(chatId));
