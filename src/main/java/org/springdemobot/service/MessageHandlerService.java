@@ -3,6 +3,7 @@ package org.springdemobot.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdemobot.enums.BotMessage;
+import org.springframework.boot.Banner;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
@@ -16,6 +17,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 public class MessageHandlerService {
     private final UserService userService;
     private final MessageSenderService messageSenderService;
+    private final ModerationService moderationService;
     private final ProfanityCheckerService profanityCheckerService;
 
     public void handleUpdate(Update update, TelegramLongPollingBot bot) {
@@ -28,7 +30,7 @@ public class MessageHandlerService {
                 if (message.isGroupMessage() || message.isSuperGroupMessage()) {
                     try {
                         bot.execute(new DeleteMessage(String.valueOf(chatId), message.getMessageId()));
-                        userService.muteUser(bot, message.getFrom().getId(), message.getChatId(), 640);
+                        moderationService.muteUser(bot, message.getFrom().getId(), message.getChatId(), 640);
                         messageSenderService.sendMessage(bot, message.getFrom().getId(), BotMessage.MUTED_FOR_PROFANITY.get());
                     } catch (TelegramApiException e) {
                         log.error(e.getMessage());
