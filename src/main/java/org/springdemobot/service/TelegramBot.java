@@ -2,6 +2,7 @@ package org.springdemobot.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdemobot.admin.AdminMessageHandlerService;
 import org.springdemobot.config.BotConfig;
 import org.springdemobot.enums.BotMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Autowired
     public TelegramBot(BotConfig config,
                        MessageHandlerService messageHandlerService,
-                       BotCommandService botCommandService) {
+                       BotCommandService botCommandService, AdminMessageHandlerService adminMessageHandlerService) {
         this.config = config;
         this.messageHandlerService = messageHandlerService;
         this.botCommandService = botCommandService;
@@ -36,7 +37,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        messageHandlerService.handleUpdate(update, this);
+            messageHandlerService.handleUpdate(update, this);
     }
 
     @Override
