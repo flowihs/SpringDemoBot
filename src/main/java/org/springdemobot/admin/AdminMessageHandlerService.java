@@ -23,7 +23,7 @@ public class AdminMessageHandlerService {
 
     public void processUsernameInput(String messageText, long chatId, User user) {
         String userNameToBlock = messageText;
-        if (!messageText.startsWith("@") && user.getRole().equals(Role.ROLE_USER)) {
+        if (!messageText.startsWith("@") && user.getRole().equals(Role.ROLE_ADMIN)) {
             return;
         }
         Optional<User> user1 = userRepository.findByUserName(userNameToBlock);

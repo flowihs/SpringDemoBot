@@ -59,7 +59,6 @@ public class MessageHandlerService {
                     messageSenderService.sendMessage(bot, chatId, BotMessage.WELCOME.get());
                 }
                 if (user.getRole().equals(Role.ROLE_ADMIN)) {
-                    log.info(update.getMessage().getFrom().getUserName());
                     adminMessageSenderService.sendMessage(bot, update, chatId, BotMessage.WELCOME.get());
                 }
                 break;
