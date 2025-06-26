@@ -31,7 +31,6 @@ public class MessageHandlerService {
 
 
     public void handleUpdate(Update update, TelegramLongPollingBot bot) {
-
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
@@ -42,10 +41,14 @@ public class MessageHandlerService {
             BotState currentState = userStates.getOrDefault(chatId, BotState.DEFAULT);
 
             switch (currentState) {
-                case WAITING_FOR_USERNAME:
-                    adminMessageHandlerService.processUsernameInput(messageText, chatId, user);
+                case ADD_TO_BLACKLIST:
+                    adminMessageHandlerService.processUsernameInput(bot, messageText, chatId);
                     userStates.remove(chatId);
-                    return;
+                    break;
+                case DELETE_FROM_BLACKLIST:
+                    adminMessageHandlerService.removeUserFromBlacklist(bot, messageText, chatId);
+                    userStates.remove(chatId);
+                    break;
                 default:
                     handler(update, bot, user, chatId, messageText);
             }
@@ -67,8 +70,13 @@ public class MessageHandlerService {
                 break;
             case "Добавить в чёрный список":
                 if (user.getRole().equals(Role.ROLE_USER)) break;
-                messageSenderService.sendMessage(bot, chatId, BotMessage.ADMIN_ROLE_MESSAGE.get());
-                userStates.put(chatId, BotState.WAITING_FOR_USERNAME);
+                messageSenderService.sendMessage(bot, chatId, BotMessage.ADMIN_ADD_BLACKLIST_MESSAGE.get());
+                userStates.put(chatId, BotState.ADD_TO_BLACKLIST);
+                break;
+            case "Удалить из чёрного списка":
+                if (user.getRole().equals(Role.ROLE_USER)) break;
+                messageSenderService.sendMessage(bot, chatId, BotMessage.ADMIN_DELETE_FROM_BLACKLIST.get());
+                userStates.put(chatId, BotState.DELETE_FROM_BLACKLIST);
                 break;
             default:
                 messageSenderService.sendMessage(bot, chatId, BotMessage.UNKNOWN_COMMAND.get());

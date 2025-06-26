@@ -23,18 +23,25 @@ public class AdminMessageSenderService {
         message.setChatId(String.valueOf(chatId));
         message.setText(textToSend);
 
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setOneTimeKeyboard(true);
-        keyboardMarkup.setResizeKeyboard(true);
-        KeyboardRow row = new KeyboardRow();
-        row.add("Добавить в чёрный список");
-        keyboardMarkup.setKeyboard(List.of(row));
-
+        final var keyboardMarkup = keyboardMarkup();
         message.setReplyMarkup(keyboardMarkup);
         try {
             bot.execute(message);
         } catch (TelegramApiException e) {
             log.error("Error occurred while sending message: " + e.getMessage());
         }
+    }
+
+    public ReplyKeyboardMarkup keyboardMarkup() {
+        final var replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setOneTimeKeyboard(true);
+        replyKeyboardMarkup.setResizeKeyboard(true);
+
+        KeyboardRow row = new KeyboardRow();
+        row.add("Добавить в чёрный список");
+        row.add("Удалить из чёрного списка");
+
+        replyKeyboardMarkup.setKeyboard(List.of(row));
+        return replyKeyboardMarkup;
     }
 }

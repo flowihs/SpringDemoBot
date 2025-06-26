@@ -25,6 +25,7 @@ public class UserService {
                     message.getChat().getFirstName(),
                     message.getChat().getLastName(),
                     message.getChat().getUserName(),
+                    false,
                     Role.ROLE_USER,
                     new Timestamp(System.currentTimeMillis())
             );

@@ -1,6 +1,7 @@
 package org.springdemobot.enums;
 
 public enum BotState {
-    WAITING_FOR_USERNAME,
-    DEFAULT
+    ADD_TO_BLACKLIST,
+    DEFAULT,
+    DELETE_FROM_BLACKLIST
 }

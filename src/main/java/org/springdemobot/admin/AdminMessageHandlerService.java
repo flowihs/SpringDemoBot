@@ -20,18 +20,39 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AdminMessageHandlerService {
     private final UserRepository userRepository;
+    private final MessageSenderService messageService;
+    private final static String IncorrectData = "Вы ввели некорректные данные!";
+    private final static String UserNotFound = "Вы ввели не существующего пользователя!";
 
-    public void processUsernameInput(String messageText, long chatId, User user) {
-        String userNameToBlock = messageText;
-        if (!messageText.startsWith("@") && user.getRole().equals(Role.ROLE_ADMIN)) {
+    public void processUsernameInput(TelegramLongPollingBot bot, String messageText, long chatId) {
+        if (!messageText.startsWith("@")) {
+            messageService.sendMessage(bot, chatId, IncorrectData);
             return;
         }
-        Optional<User> user1 = userRepository.findByUserName(userNameToBlock);
-
-        if (user1.isPresent()) {
-            user1.get().setBlocked(true);
-            userRepository.save(user1.get());
+        String userNameToBlock = messageText.replace("@", "");
+        Optional<User> user = userRepository.findByUserName(userNameToBlock);
+        if (user.isEmpty()) {
+            messageService.sendMessage(bot, chatId, UserNotFound);
         }
-
+        user.get().setBlocked(true);
+        userRepository.save(user.get());
+        messageService.sendMessage(bot, chatId, "Пользователь " + userNameToBlock + " успешно добавлен в чёрный список!");
     }
+
+
+public void removeUserFromBlacklist(TelegramLongPollingBot bot, String message, long chatId) {
+    if (!message.startsWith("@")) {
+        messageService.sendMessage(bot, chatId, IncorrectData);
+        return;
+    }
+    String userNameToBlock = message.replace("@", "");
+    Optional<User> user = userRepository.findByUserName(userNameToBlock);
+    if (user.isEmpty()) {
+        messageService.sendMessage(bot, chatId, UserNotFound);
+        return;
+    }
+    user.get().setBlocked(false);
+    userRepository.save(user.get());
+    messageService.sendMessage(bot, chatId, "Пользователь " + userNameToBlock + " успешно удалён из чёрного списка!");
+}
 }

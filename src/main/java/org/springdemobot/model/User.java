@@ -26,18 +26,19 @@ public class User {
 
     private String userName;
 
-    private boolean isBlocked = false;
+    private boolean isBlocked;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
     private Timestamp registeredAt;
 
-    public User(Long chatId, String firstName, String lastName, String userName,Role role , Timestamp registeredAt) {
+    public User(Long chatId, String firstName, String lastName, String userName, boolean isBlocked, Role role , Timestamp registeredAt) {
         this.chatId = chatId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.userName = userName;
+        this.isBlocked = isBlocked;
         this.role = role;
         this.registeredAt = registeredAt;
     }
