@@ -7,17 +7,10 @@ import org.telegram.telegrambots.meta.api.methods.groupadministration.BanChatMem
 import org.telegram.telegrambots.meta.api.methods.groupadministration.RestrictChatMember;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.UnbanChatMember;
 import org.telegram.telegrambots.meta.api.objects.ChatPermissions;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Service
 @Slf4j
 public class ModerationService {
-
-    private final MessageSenderService messageSenderService;
-
-    public ModerationService(MessageSenderService messageSenderService) {
-        this.messageSenderService = messageSenderService;
-    }
 
     public RestrictChatMember muteUser(TelegramLongPollingBot bot, Long userId, Long chatId, int seconds) {
         RestrictChatMember muteUser = new RestrictChatMember();
