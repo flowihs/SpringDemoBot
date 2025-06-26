@@ -13,27 +13,33 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Slf4j
 public class ModerationService {
 
-    public void muteUser(TelegramLongPollingBot bot, Long userId, Long chatId, int seconds) {
+    private final MessageSenderService messageSenderService;
+
+    public ModerationService(MessageSenderService messageSenderService) {
+        this.messageSenderService = messageSenderService;
+    }
+
+    public RestrictChatMember muteUser(TelegramLongPollingBot bot, Long userId, Long chatId, int seconds) {
         RestrictChatMember muteUser = new RestrictChatMember();
         muteUser.setChatId(String.valueOf(chatId));
         muteUser.setUserId(userId);
 
         ChatPermissions permissions = new ChatPermissions();
         permissions.setCanSendMessages(false);
+        permissions.setCanSendMediaMessages(false);
+        permissions.setCanSendPolls(false);
+        permissions.setCanSendOtherMessages(false);
+        permissions.setCanAddWebPagePreviews(false);
         muteUser.setPermissions(permissions);
 
-        int untilDate = (int) (System.currentTimeMillis() / 1000) + seconds;
-        muteUser.setUntilDate(untilDate);
-
-        try {
-            bot.execute(muteUser);
-            log.info("User with ID {} has been tortured in chat {} for {} seconds.", userId, chatId, seconds);
-        } catch (TelegramApiException e) {
-            log.error(e.getMessage());
+        if (seconds > 0) {
+            int untilDate = (int) (System.currentTimeMillis() / 1000) + seconds;
+            muteUser.setUntilDate(untilDate);
         }
+        return muteUser;
     }
 
-    public void unmuteUser(TelegramLongPollingBot bot, Long userId, Long chatId) {
+    public RestrictChatMember unmuteUser(TelegramLongPollingBot bot, Long userId, Long chatId) {
         RestrictChatMember unmuteUser = new RestrictChatMember();
         unmuteUser.setChatId(String.valueOf(chatId));
         unmuteUser.setUserId(userId);
@@ -41,39 +47,25 @@ public class ModerationService {
         ChatPermissions permissions = new ChatPermissions();
         permissions.setCanSendMessages(true);
         unmuteUser.setPermissions(permissions);
-
-        try {
-            bot.execute(unmuteUser);
-            log.info("User with ID {} has been tortured in chat {}", userId, chatId);
-        } catch (TelegramApiException e) {
-            log.error(e.getMessage());
-        }
+        return unmuteUser;
     }
 
-    public void banUser(TelegramLongPollingBot bot, Long userId, Long chatId, int seconds) {
+    public BanChatMember banUser(TelegramLongPollingBot bot, Long userId, Long chatId, int seconds) {
         BanChatMember banChatMember = new BanChatMember();
         banChatMember.setChatId(String.valueOf(chatId));
         banChatMember.setUserId(userId);
         if (seconds > 0) {
             banChatMember.setUntilDate((int) (System.currentTimeMillis() / 1000) + seconds);
         }
-        try {
-            bot.execute(banChatMember);
-            log.info("User with ID {} has been banned in chat {}", userId, chatId);
-        } catch (TelegramApiException e) {
-            log.error(e.getMessage());
-        }
+        return banChatMember;
     }
 
-    public void unbanUser(TelegramLongPollingBot bot, Long userId, Long chatId) {
+    public UnbanChatMember unbanUser(TelegramLongPollingBot bot, Long userId, Long chatId) {
         UnbanChatMember unbanChatMember = new UnbanChatMember();
         unbanChatMember.setChatId(String.valueOf(chatId));
         unbanChatMember.setUserId(userId);
-        try {
-            bot.execute(unbanChatMember);
-            log.info("User with ID {} has been unbanned in chat {}", userId, chatId);
-        } catch (TelegramApiException e) {
-            log.error(e.getMessage());
-        }
+        return unbanChatMember;
     }
+
+
 }

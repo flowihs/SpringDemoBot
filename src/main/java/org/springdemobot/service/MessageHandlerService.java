@@ -3,7 +3,6 @@ package org.springdemobot.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdemobot.enums.BotMessage;
-import org.springframework.boot.Banner;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
@@ -30,7 +29,7 @@ public class MessageHandlerService {
                 if (message.isGroupMessage() || message.isSuperGroupMessage()) {
                     try {
                         bot.execute(new DeleteMessage(String.valueOf(chatId), message.getMessageId()));
-                        moderationService.muteUser(bot, message.getFrom().getId(), message.getChatId(), 640);
+                        bot.execute(moderationService.muteUser(bot, message.getFrom().getId(), message.getChatId(), 640));
                         messageSenderService.sendMessage(bot, message.getFrom().getId(), BotMessage.MUTED_FOR_PROFANITY.get());
                     } catch (TelegramApiException e) {
                         log.error(e.getMessage());
@@ -38,6 +37,7 @@ public class MessageHandlerService {
                 }
                 return;
             }
+
 
             switch (messageText) {
                 case "/start":
@@ -47,6 +47,7 @@ public class MessageHandlerService {
                 case "/help":
                     messageSenderService.sendMessage(bot, chatId, BotMessage.HELP_MESSAGE.get());
                     break;
+
                 default:
                     messageSenderService.sendMessage(bot, chatId, BotMessage.UNKNOWN_COMMAND.get());
             }
