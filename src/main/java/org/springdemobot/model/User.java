@@ -18,7 +18,7 @@ import java.sql.Timestamp;
 public class User {
 
     @Id
-    private Long chatId;
+    private Long userId;
 
     private String firstName;
 
@@ -33,8 +33,8 @@ public class User {
 
     private Timestamp registeredAt;
 
-    public User(Long chatId, String firstName, String lastName, String userName, boolean isBlocked, Role role , Timestamp registeredAt) {
-        this.chatId = chatId;
+    public User(Long userId, String firstName, String lastName, String userName, boolean isBlocked, Role role , Timestamp registeredAt) {
+        this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.userName = userName;

@@ -16,8 +16,7 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
 
-    public User registerUserIfNew(Update update, Message message) {
-        Long userId = update.getMessage().getFrom().getId();
+    public User registerUserIfNew(long userId, Message message) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             User entity = new User(
