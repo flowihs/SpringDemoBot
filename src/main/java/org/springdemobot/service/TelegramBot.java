@@ -52,15 +52,4 @@ public class TelegramBot extends TelegramLongPollingBot {
     public String getBotToken() {
         return config.getBotToken();
     }
-
-    public void sendMessage(long chatId, String text) {
-        SendMessage message = new SendMessage();
-        message.setChatId(String.valueOf(chatId));
-        message.setText(text);
-        try {
-            execute(message);
-        } catch (TelegramApiException e) {
-            log.error("Error occurred while sending message: " + e.getMessage());
-        }
-    }
 }
